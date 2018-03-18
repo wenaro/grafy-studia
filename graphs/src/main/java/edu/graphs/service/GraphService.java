@@ -1,12 +1,9 @@
 package edu.graphs.service;
 
-import edu.graphs.model.VertexNeighborhood;
+import edu.graphs.model.Edge;
+import edu.graphs.model.Graph;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleWeightedGraph;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,34 +11,26 @@ public class GraphService {
 
     private static final String NEW_LINE_SEPARATOR = "\r\n";
     private static final String ARROW_SEPARATOR = "->";
-    private static final int VERTEX_NAME_POSITION = 0;
+    private static final int MAIN_VERTEX_POSITION = 0;
+    private static final int DEFAULT_WEIGHT = 1;
 
-    public Graph convertNeighborhoodMatrix(final String matrix) {
+    public Graph createGraph(final String text) {
+        return createFromNeighborhoodList(text);
+    }
 
-        final Graph<String, DefaultEdge> graph = new SimpleWeightedGraph<>(DefaultEdge.class);
-        final List<VertexNeighborhood> vertexNeighborhoods = createVertexNeighborhoodList(matrix);
-
-        vertexNeighborhoods.forEach(vertexNeighborhood -> graph.addVertex(vertexNeighborhood.getVertexName()));
-        //todo nie wiem czemu nie mozna dodawac polaczen w petli java.lang.IllegalArgumentException: loops not allowed
-/*        vertexNeighborhoods.forEach(vertexNeighborhood -> {
-            final List<String> adjacentNodeNames = vertexNeighborhood.getNeighborhoods();
-            adjacentNodeNames
-                .forEach(adjacentNodeName -> graph.addEdge(vertexNeighborhood.getVertexName(), adjacentNodeName));
-
-        });*/
-
+    private Graph createFromNeighborhoodList(final String text) {
+        final Graph graph = new Graph();
+        final List<String> lines = Arrays.asList(text.split(NEW_LINE_SEPARATOR));
+        lines.forEach(line -> convertNeighborhoodLine(graph, line));
         return graph;
     }
 
-    private List<VertexNeighborhood> createVertexNeighborhoodList(final String matrix) {
-        final List<String> lines = Arrays.asList(matrix.split(NEW_LINE_SEPARATOR));
-        return lines.stream().map(this::createVertexNeighborhood).collect(Collectors.toList());
+    private void convertNeighborhoodLine(final Graph graph, final String line) {
+        final List<String> vertices = Arrays.asList(line.split(ARROW_SEPARATOR));
+        vertices.forEach(graph::addVertex);
+        for (int i = 1; i < vertices.size(); i++) {
+            graph.addEdge(new Edge(vertices.get(MAIN_VERTEX_POSITION), vertices.get(i), DEFAULT_WEIGHT));
+        }
     }
 
-    private VertexNeighborhood createVertexNeighborhood(final String line) {
-        final String[] vertexes = line.split(ARROW_SEPARATOR);
-        final String vertexName = vertexes[VERTEX_NAME_POSITION];
-        final List<String> vertexNeighborhoods = Arrays.asList(vertexes);
-        return new VertexNeighborhood(vertexName, vertexNeighborhoods);
-    }
 }

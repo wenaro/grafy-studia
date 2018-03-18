@@ -1,16 +1,14 @@
 package edu.graphs.model;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
 @AllArgsConstructor
-public class VertexNeighborhood {
+public class Edge {
 
-    private String vertexName;
-
-    private List<String> neighborhoods;
+    private String source;
+    private String destination;
+    private int weight;
 }

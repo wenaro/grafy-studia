@@ -1,9 +1,9 @@
 package edu.graphs.controller;
 
 import edu.graphs.input.Input;
+import edu.graphs.model.Graph;
 import edu.graphs.service.GraphService;
 import lombok.AllArgsConstructor;
-import org.jgrapht.Graph;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,11 +24,9 @@ public class GraphsController {
 
     @PostMapping(value = "/")
     public String submitInput(final Model model, @ModelAttribute final Input input) {
-        final Graph graph = graphService.convertNeighborhoodMatrix(input.getText());
-        model.addAttribute("vertexSet", graph.vertexSet());
-        model.addAttribute("edgeSet", graph.edgeSet());
+        final Graph graph = graphService.createGraph(input.getText());
+        model.addAttribute("vertices", graph.getVertices());
+        model.addAttribute("edges", graph.getEdges());
         return "index";
-
     }
-
 }

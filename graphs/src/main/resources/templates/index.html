@@ -4,16 +4,15 @@
     <meta charset="UTF-8">
     <title>Graphs Application</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="webjars/cytoscape/3.2.5/dist/cytoscape.js"></script>
 </head>
 
 <style>
     #cy {
         width: 100%;
-        height: 100%;
+        height: 70%;
         position: absolute;
+        display: block;
     }
 </style>
 
@@ -23,8 +22,8 @@
 </div>
 <div class="container">
     <form action="/" th:action="@{/}" th:object="${input}" method="post">
-        Input matrix:
-        <br><textarea style="background: lightgray" class="form-control" th:field="*{text}" id="inputText" rows="5"/>
+        Input text:
+        <br><textarea style="background: azure" class="form-control" th:field="*{text}" id="inputText" rows="5"/>
         <br><input type="submit" value="Submit"/>
     </form>
 </div>
@@ -32,46 +31,64 @@
 <div id="cy"></div>
 
 <script th:inline="javascript">
-    var cy = cytoscape({
+    var vertices = /*[[${vertices}]]*/;
+    var verticesArray = [];
+
+
+    for (var i = 0; i < vertices.length; i++) {
+        verticesArray.push(
+            {
+                group: "nodes",
+                data: {
+                    id: vertices[i]
+                }
+            }
+        );
+    }
+
+
+    var edges = /*[[${edges}]]*/;
+    var edgesArray = [];
+    for (var i = 0; i < edges.length; i++) {
+        var edge = edges[i];
+
+        edgesArray.push(
+            {
+                group: "edges", data: {
+                    id: "e" + edge.source + edge.destination,
+                    source: edge.source,
+                    target: edge.destination,
+                    weight: edge.weight
+                }
+            }
+        );
+    }
+
+    cytoscape({
         container: document.getElementById('cy'),
+        elements: {
+            nodes: verticesArray,
+            edges: edgesArray
+        },
         style: cytoscape.stylesheet()
             .selector('node')
             .css({
-                'content': 'data(id)'
+                'content': 'data(id)',
+                'background-color': 'blue'
             })
+            .selector('edge')
+            .css({
+                'content': 'data(weight)',
+                /*'line-style': 'solid' 'dotted' 'dashed'*/
+            }),
+
+        layout: {
+            name: 'cose'
+            /* cose lub circle */
+            /* cose - generuje za kazdym razem inaczej (uzywa symulacji fizyki do rzmieszczenia) */
+            /* circle - umieszcza węzły w okręgu */
+        }
     });
-
-    var vertexSet = [[${vertexSet}]];
-    console.log(vertexSet.length);
-
-    for (var i = 0; i < vertexSet.length; i++) {
-        console.log(vertexSet[i]);
-        cy.add([
-            {group: "nodes", data: {id: vertexSet[i]}}
-        ]);
-    }
-
-    var edgeSet = [[${edgeSet}]];
-
-    /*
-        elements: {
-            nodes: [
-                {data: {id: 'a'}},
-                {data: {id: 'b'}},
-                {data: {id: 'c'}},
-                {data: {id: 'd'}}
-            ],
-
-                edges
-        :
-            [
-                {data: {id: 'ad', weight: 1, source: 'a', target: 'd'}},
-                {data: {id: 'ab', weight: 3, source: 'a', target: 'b'}},
-                {data: {id: 'bd', weight: 4, source: 'b', target: 'd'}},
-                {data: {id: 'bc', weight: 5, source: 'b', target: 'c'}},
-                {data: {id: 'cd', weight: 2, source: 'c', target: 'd'}},
-            ]
-        }*/
 </script>
 
 </body>
