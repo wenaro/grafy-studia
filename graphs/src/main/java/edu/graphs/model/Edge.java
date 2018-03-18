@@ -8,6 +8,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Edge {
 
+    private String label;
     private String source;
     private String destination;
     private int weight;

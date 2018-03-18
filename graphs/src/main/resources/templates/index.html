@@ -56,7 +56,8 @@
             {
                 group: "nodes",
                 data: {
-                    id: vertices[i]
+                    id: vertices[i],
+                    label: vertices[i]
                 }
             }
         );
@@ -73,7 +74,8 @@
                     id: "e" + edge.source + edge.destination,
                     source: edge.source,
                     target: edge.destination,
-                    weight: edge.weight
+                    weight: edge.weight,
+                    label: edge.label
                 }
             }
         );
@@ -88,7 +90,7 @@
         style: cytoscape.stylesheet()
             .selector('node')
             .css({
-                'content': 'data(id)',
+                'content': 'data(label)',
                 'background-color': 'blue'
             })
             .selector('edge')

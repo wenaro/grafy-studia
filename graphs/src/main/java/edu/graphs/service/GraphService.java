@@ -3,6 +3,7 @@ package edu.graphs.service;
 import edu.graphs.input.Type;
 import edu.graphs.model.Edge;
 import edu.graphs.model.Graph;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -34,8 +35,19 @@ public class GraphService {
         for (int i = 0; i < rows.size(); i++) {
             graph.addVertex(String.valueOf(i));
         }
+        final List<String> createdVertices = new ArrayList<>(graph.getVertices());
 
-        //todo utowrzyc polaczenia miedzy wierzcholkami
+        for (int sourceVertexPosition = 0; sourceVertexPosition < rows.size(); sourceVertexPosition++) {
+            final List<String> elementsInRow =
+                Arrays.asList(rows.get(sourceVertexPosition).split(WHITE_SPACE_SEPARATOR));
+
+            for (int destVertexPosition = 0; destVertexPosition < elementsInRow.size(); destVertexPosition++) {
+                if ("1".equals(elementsInRow.get(destVertexPosition))) {
+                    addEdge(graph, createdVertices, sourceVertexPosition, destVertexPosition);
+                }
+            }
+        }
+
         return graph;
     }
 
@@ -49,9 +61,20 @@ public class GraphService {
     private void convertNeighborhoodLine(final Graph graph, final String line) {
         final List<String> vertices = Arrays.asList(line.split(ARROW_SEPARATOR));
         vertices.forEach(graph::addVertex);
-        for (int i = 1; i < vertices.size(); i++) {
-            graph.addEdge(new Edge(vertices.get(MAIN_VERTEX_POSITION), vertices.get(i), DEFAULT_WEIGHT));
+        for (int destVertexPosition = 1; destVertexPosition < vertices.size(); destVertexPosition++) {
+            addEdge(graph, vertices, destVertexPosition, MAIN_VERTEX_POSITION);
         }
+    }
+
+    private void addEdge(final Graph graph, final List<String> vertices, final int sourceVertexPosition,
+                         final int destinationVertexPosition) {
+        final String source = vertices.get(sourceVertexPosition);
+        final String destination = vertices.get(destinationVertexPosition);
+        graph.addEdge(new Edge(createEdgeLabel(source, destination), source, destination, DEFAULT_WEIGHT));
+    }
+
+    private String createEdgeLabel(final String source, final String destination) {
+        return source + "-" + destination;
     }
 
 }
