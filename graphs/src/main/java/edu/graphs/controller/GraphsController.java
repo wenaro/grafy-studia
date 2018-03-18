@@ -1,6 +1,7 @@
 package edu.graphs.controller;
 
 import edu.graphs.input.Input;
+import edu.graphs.input.Type;
 import edu.graphs.model.Graph;
 import edu.graphs.service.GraphService;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public class GraphsController {
 
     @PostMapping(value = "/")
     public String submitInput(final Model model, @ModelAttribute final Input input) {
-        final Graph graph = graphService.createGraph(input.getText());
+        final Graph graph = graphService.createGraph(input.getType(), input.getText());
         model.addAttribute("vertices", graph.getVertices());
         model.addAttribute("edges", graph.getEdges());
         return "index";

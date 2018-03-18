@@ -14,17 +14,33 @@
         position: absolute;
         display: block;
     }
+
+    #appTitle {
+        text-align: center;
+    }
+
 </style>
 
-<body style="background: beige">
+<body>
 <div>
-    <h1 style="text-align: center; ">Graphs Application</h1>
+    <h1 id="appTitle">Graphs Application</h1>
 </div>
 <div class="container">
     <form action="/" th:action="@{/}" th:object="${input}" method="post">
         Input text:
-        <br><textarea style="background: azure" class="form-control" th:field="*{text}" id="inputText" rows="5"/>
-        <br><input type="submit" value="Submit"/>
+        <br/><textarea style="background: azure" class="form-control" th:field="*{text}" id="inputText"
+                       rows="5"> </textarea>
+        <br/><input type="submit" value="Generate"/>
+        <select id="selectType" th:field="*{type}">
+    <!--        <option th:value="NEIGHBORHOOD_LIST"
+                    selected="selected">
+                Generation Mode
+            </option>--> <!-- Opcjonalne -->
+            <option th:each="type :${T(edu.graphs.input.Type).values()}"
+                    th:value="${type}"
+                    th:text="${type.literal}">
+            </option>
+        </select>
     </form>
 </div>
 
@@ -45,7 +61,6 @@
             }
         );
     }
-
 
     var edges = /*[[${edges}]]*/;
     var edgesArray = [];
@@ -81,7 +96,6 @@
                 'content': 'data(weight)',
                 /*'line-style': 'solid' 'dotted' 'dashed'*/
             }),
-
         layout: {
             name: 'cose'
             /* cose lub circle */
