@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Graphs Application</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="webjars/cytoscape/3.2.5/dist/cytoscape.js"></script>
+</head>
+
+<style>
+    #cy {
+        width: 100%;
+        height: 40%;
+        position: absolute;
+        display: block;
+    }
+
+    #appTitle {
+        text-align: center;
+    }
+
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        width: 200px;
+        background-color: #f1f1f1;
+    }
+
+    li a {
+        display: block;
+        color: #000;
+        padding: 8px 16px;
+        text-decoration: none;
+    }
+
+    li a.active {
+        background-color: lightblue;
+        color: white;
+    }
+
+    li a:hover:not(.active) {
+        background-color: #555;
+        color: white;
+    }
+</style>
+
+<body>
+<div>
+    <h1 id="appTitle">Graphs Application</h1>
+</div>
+
+<ul>
+    <li><a class="active" href="/">Home</a></li>
+    <li><a href="generate">Generate Graph</a></li>
+    <li><a href="about">About</a></li>
+</ul>
+
+<div class="container">
+    <form action="/" th:action="@{/generate}" th:object="${input}" method="post">
+        Input text:
+        <br/><textarea placeholder="Read &quot About &quot to know how to enter data correctly"
+                       style="border: solid black 2px"
+                       th:field="*{text}"
+                       id="inputText"
+                       rows="10" cols="30">
+            </textarea>
+        <br/><input type="submit" value="Generate"/>
+        <select id="selectType" th:field="*{type}">
+            <option th:each="type :${T(edu.graphs.input.Type).values()}"
+                    th:value="${type}"
+                    th:text="${type.literal}">
+            </option>
+        </select>
+    </form>
+    <!--
+       <form action="/form">
+            <div class="col-lg-6">
+                <label for="vertices">Vertices:</label>
+                <input type="text" class="col-lg-6" id="vertices">
+            </div>
+
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>-->
+</div>
+
+
+<div id="cy"></div>
+
+<script th:inline="javascript">
+    var vertices = /*[[${vertices}]]*/;
+    var verticesArray = [];
+
+
+    for (var i = 0; i < vertices.length; i++) {
+        verticesArray.push(
+            {
+                group: "nodes",
+                data: {
+                    id: vertices[i],
+                    label: vertices[i]
+                }
+            }
+        );
+    }
+
+    var edges = /*[[${edges}]]*/;
+    var edgesArray = [];
+    for (var i = 0; i < edges.length; i++) {
+        var edge = edges[i];
+
+        edgesArray.push(
+            {
+                group: "edges", data: {
+                    id: "e" + edge.source + edge.destination,
+                    source: edge.source,
+                    target: edge.destination,
+                    weight: edge.weight,
+                    label: edge.label
+                }
+            }
+        );
+    }
+
+    cytoscape({
+        container: document.getElementById('cy'),
+        elements: {
+            nodes: verticesArray,
+            edges: edgesArray
+        },
+        style: cytoscape.stylesheet()
+            .selector('node')
+            .css({
+                'content': 'data(label)',
+                'background-color': 'blue'
+            })
+            .selector('edge')
+            .css({
+                'content': 'data(weight)',
+                /*'line-style': 'solid' 'dotted' 'dashed'*/
+            }),
+        layout: {
+            name: 'circle'
+            /* cose lub circle */
+            /* cose - generuje za kazdym razem inaczej (uzywa symulacji fizyki do rzmieszczenia) */
+            /* circle - umieszcza węzły w okręgu */
+        }
+    });
+</script>
+
+</body>
+</html>
