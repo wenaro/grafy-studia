@@ -32,10 +32,10 @@
                        rows="5"> </textarea>
         <br/><input type="submit" value="Generate"/>
         <select id="selectType" th:field="*{type}">
-    <!--        <option th:value="NEIGHBORHOOD_LIST"
-                    selected="selected">
-                Generation Mode
-            </option>--> <!-- Opcjonalne -->
+            <!--        <option th:value="NEIGHBORHOOD_LIST"
+                            selected="selected">
+                        Generation Mode
+                    </option>--> <!-- Opcjonalne -->
             <option th:each="type :${T(edu.graphs.input.Type).values()}"
                     th:value="${type}"
                     th:text="${type.literal}">
@@ -99,7 +99,7 @@
                 /*'line-style': 'solid' 'dotted' 'dashed'*/
             }),
         layout: {
-            name: 'cose'
+            name: 'circle'
             /* cose lub circle */
             /* cose - generuje za kazdym razem inaczej (uzywa symulacji fizyki do rzmieszczenia) */
             /* circle - umieszcza węzły w okręgu */

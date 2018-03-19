@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum Type {
 
     NEIGHBORHOOD_LIST("Neighborhood List"),
-    NEIGHBORHOOD_MATRIX("Neighborhood Matrix");
+    NEIGHBORHOOD_MATRIX("Neighborhood Matrix"),
+    INCIDENCE_MATRIX("Incidence Matrix");
 
     private final String literal;
 

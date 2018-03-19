@@ -21,11 +21,28 @@ public class GraphService {
         switch (type) {
             case NEIGHBORHOOD_MATRIX:
                 return createFromNeighborhoodMatrix(text);
+            case INCIDENCE_MATRIX:
+                return createFromIncidenceMatrix(text);
             case NEIGHBORHOOD_LIST:
             default:
                 return createFromNeighborhoodList(text);
         }
 
+    }
+
+    private Graph createFromIncidenceMatrix(final String matrix) {
+        final List<String> rows = Arrays.asList(matrix.split(NEW_LINE_SEPARATOR));
+        final Graph graph = new Graph();
+
+        for (int i = 0; i < rows.size(); i++) {
+            graph.addVertex(String.valueOf(i));
+        }
+
+        for (int i = 0; i < rows.size(); i++) {
+            //todo macierz incydencji polaczenia
+        }
+
+        return graph;
     }
 
     private Graph createFromNeighborhoodMatrix(final String matrix) {
@@ -36,7 +53,7 @@ public class GraphService {
             graph.addVertex(String.valueOf(i));
         }
         final List<String> createdVertices = new ArrayList<>(graph.getVertices());
-
+        graph.getVertices().iterator().next();
         for (int sourceVertexPosition = 0; sourceVertexPosition < rows.size(); sourceVertexPosition++) {
             final List<String> elementsInRow =
                 Arrays.asList(rows.get(sourceVertexPosition).split(WHITE_SPACE_SEPARATOR));
