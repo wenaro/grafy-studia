@@ -3,10 +3,11 @@ package edu.graphs.service;
 import edu.graphs.input.Type;
 import edu.graphs.model.Edge;
 import edu.graphs.model.Graph;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.springframework.stereotype.Component;
 
 @Component
 public class GraphService {
@@ -16,6 +17,7 @@ public class GraphService {
     private static final String WHITE_SPACE_SEPARATOR = " ";
     private static final int MAIN_VERTEX_POSITION = 0;
     private static final int DEFAULT_WEIGHT = 1;
+    private static final char[] ALPHABET = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 
     public Graph createGraph(final Type type, final String text) {
         switch (type) {
@@ -33,16 +35,47 @@ public class GraphService {
     private Graph createFromIncidenceMatrix(final String matrix) {
         final List<String> rows = Arrays.asList(matrix.split(NEW_LINE_SEPARATOR));
         final Graph graph = new Graph();
+        final int nodeCount = rows.size();
+        final int edgeCount = rows.get(0).split(" ").length;
 
-        for (int i = 0; i < rows.size(); i++) {
-            graph.addVertex(String.valueOf(i));
+        for (int i = 0; i < nodeCount; i++) {
+            graph.addVertex(String.valueOf(ALPHABET[i]));
         }
 
-        for (int i = 0; i < rows.size(); i++) {
-            //todo macierz incydencji polaczenia
+        final List<String> createdVertices = new ArrayList<>(graph.getVertices());
+        final String[][] matrixArray = new String[nodeCount][edgeCount];
+        fillMatrixArray(rows, matrixArray);
+
+        for (int i = 0; i< nodeCount; i++) {
+            final List<String> firstRow = Arrays.asList(rows.get(i).split(" "));
+            for (int j=0;j<firstRow.size();j++){
+                matrixArray[i][j]=firstRow.get(j);
+            }
+        }
+
+        for (int columnIndex = 0; columnIndex< edgeCount; columnIndex++){
+            List<Integer> nodes = new ArrayList<>(2);
+            for (int rowIndex = 0; rowIndex< nodeCount; rowIndex++){
+                if (matrixArray[rowIndex][columnIndex].contains("1")){
+                    nodes.add(rowIndex);
+                }
+                if (nodes.size()==2){
+                    break;
+                }
+            }
+            addEdge(graph,createdVertices,nodes.get(0), nodes.get(1));
         }
 
         return graph;
+    }
+
+    private void fillMatrixArray(List<String> rows, String[][] matrixArray) {
+        for (int i=0;i< rows.size();i++) {
+            final List<String> row = Arrays.asList(rows.get(i).split(" "));
+            for (int j=0;j<row.size();j++){
+                matrixArray[i][j]=row.get(j);
+            }
+        }
     }
 
     private Graph createFromNeighborhoodMatrix(final String matrix) {
@@ -56,7 +89,7 @@ public class GraphService {
         graph.getVertices().iterator().next();
         for (int sourceVertexPosition = 0; sourceVertexPosition < rows.size(); sourceVertexPosition++) {
             final List<String> elementsInRow =
-                Arrays.asList(rows.get(sourceVertexPosition).split(WHITE_SPACE_SEPARATOR));
+                    Arrays.asList(rows.get(sourceVertexPosition).split(WHITE_SPACE_SEPARATOR));
 
             for (int destVertexPosition = 0; destVertexPosition < elementsInRow.size(); destVertexPosition++) {
                 if ("1".equals(elementsInRow.get(destVertexPosition))) {
