@@ -166,7 +166,7 @@ public class GraphService {
         final List<String> vertices = Arrays.asList(line.split(ARROW_SEPARATOR));
         vertices.forEach(graph::addVertex);
         for (int destVertexPosition = 1; destVertexPosition < vertices.size(); destVertexPosition++) {
-            addEdge(graph, vertices, destVertexPosition, MAIN_VERTEX_POSITION);
+            addEdge(graph, vertices, MAIN_VERTEX_POSITION, destVertexPosition);
         }
     }
 
