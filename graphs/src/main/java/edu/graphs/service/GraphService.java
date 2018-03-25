@@ -54,9 +54,7 @@ public class GraphService {
     }
 
     public void updateVertex(final Graph graph, final Form form) {
-        final List<Edge> edges = new ArrayList<>();
         for (Iterator<String> it = graph.getVertices().iterator(); it.hasNext(); ) {
-
             if (form.getOldName().equals(it.next())) {
                 for (Iterator<Edge> edgeIt = graph.getEdges().iterator(); edgeIt.hasNext(); ) {
 
@@ -74,7 +72,6 @@ public class GraphService {
                 it.remove();
             }
         }
-        edges.forEach(graph::addEdge);
         graph.addVertex(form.getNewName());
     }
 
@@ -93,7 +90,7 @@ public class GraphService {
         final int edgeCount = rows.get(0).split(" ").length;
 
         for (int i = 0; i < nodeCount; i++) {
-            graph.addVertex(String.valueOf(ALPHABET[i]));
+            graph.addVertex(String.valueOf(ALPHABET[i]).toUpperCase());
         }
 
         final List<String> createdVertices = new ArrayList<>(graph.getVertices());
@@ -137,7 +134,7 @@ public class GraphService {
         final Graph graph = new Graph();
 
         for (int i = 0; i < rows.size(); i++) {
-            graph.addVertex(String.valueOf(i));
+            graph.addVertex(String.valueOf(ALPHABET[i]).toUpperCase());
         }
         final List<String> createdVertices = new ArrayList<>(graph.getVertices());
         graph.getVertices().iterator().next();
@@ -176,19 +173,22 @@ public class GraphService {
         final String destination = vertices.get(destinationVertexPosition);
         final Edge edge = new Edge(createEdgeLabel(source, destination), source, destination, DEFAULT_WEIGHT);
         final Edge reversedEdge = new Edge(createEdgeLabel(destination, source), destination, source, DEFAULT_WEIGHT);
-        removeEdge(graph, edge);
         removeEdge(graph, reversedEdge);
         graph.addEdge(edge);
     }
 
     private void removeEdge(final Graph graph, final Edge edge) {
         for (Iterator<Edge> it = graph.getEdges().iterator(); it.hasNext(); ) {
-            final Edge iteratorEdge = it.next();
-            if (iteratorEdge.getSource().equals(edge.getSource()) && iteratorEdge.getDestination()
-                .equals(edge.getDestination())) {
+            final Edge edgeFromList = it.next();
+
+            boolean isEdgeExistOnList =
+                edgeFromList.getSource().equals(edge.getSource()) && edgeFromList.getDestination().equals(edge.getDestination());
+
+            if (isEdgeExistOnList) {
                 it.remove();
             }
         }
+
     }
 
     private String createEdgeLabel(final String source, final String destination) {

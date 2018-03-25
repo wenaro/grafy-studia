@@ -1,20 +1,22 @@
 package edu.graphs.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 
 @Getter
 public class Graph {
 
-    private Set<Edge> edges = new HashSet<>();
-    private Set<String> vertices = new HashSet<>();
+    private List<Edge> edges = new ArrayList<>();
+    private List<String> vertices = new ArrayList<>();
 
     public void addEdge(final Edge edge) {
         edges.add(edge);
     }
 
     public void addVertex(final String vertex) {
-        vertices.add(vertex);
+        if (!vertices.contains(vertex)) {
+            vertices.add(vertex);
+        }
     }
 }
