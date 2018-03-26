@@ -87,7 +87,7 @@ public class GraphService {
         final List<String> rows = Arrays.asList(matrix.split(NEW_LINE_SEPARATOR));
         final Graph graph = new Graph();
         final int nodeCount = rows.size();
-        final int edgeCount = rows.get(0).split(" ").length;
+        final int edgeCount = rows.get(0).split(WHITE_SPACE_SEPARATOR).length;
 
         for (int i = 0; i < nodeCount; i++) {
             graph.addVertex(String.valueOf(ALPHABET[i]).toUpperCase());
@@ -97,15 +97,8 @@ public class GraphService {
         final String[][] matrixArray = new String[nodeCount][edgeCount];
         fillMatrixArray(rows, matrixArray);
 
-        for (int i = 0; i < nodeCount; i++) {
-            final List<String> firstRow = Arrays.asList(rows.get(i).split(" "));
-            for (int j = 0; j < firstRow.size(); j++) {
-                matrixArray[i][j] = firstRow.get(j);
-            }
-        }
-
         for (int columnIndex = 0; columnIndex < edgeCount; columnIndex++) {
-            List<Integer> nodes = new ArrayList<>(2);
+            final List<Integer> nodes = new ArrayList<>(2);
             for (int rowIndex = 0; rowIndex < nodeCount; rowIndex++) {
                 if (matrixArray[rowIndex][columnIndex].contains("1")) {
                     nodes.add(rowIndex);
@@ -122,7 +115,7 @@ public class GraphService {
 
     private void fillMatrixArray(List<String> rows, String[][] matrixArray) {
         for (int i = 0; i < rows.size(); i++) {
-            final List<String> row = Arrays.asList(rows.get(i).split(" "));
+            final List<String> row = Arrays.asList(rows.get(i).split(WHITE_SPACE_SEPARATOR));
             for (int j = 0; j < row.size(); j++) {
                 matrixArray[i][j] = row.get(j);
             }
@@ -182,7 +175,8 @@ public class GraphService {
             final Edge edgeFromList = it.next();
 
             boolean isEdgeExistOnList =
-                edgeFromList.getSource().equals(edge.getSource()) && edgeFromList.getDestination().equals(edge.getDestination());
+                edgeFromList.getSource().equals(edge.getSource()) && edgeFromList.getDestination()
+                    .equals(edge.getDestination());
 
             if (isEdgeExistOnList) {
                 it.remove();
