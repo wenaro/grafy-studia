@@ -58,14 +58,21 @@
 
 <div class="container">
     <form action="/" th:action="@{/graph}" th:object="${input}" method="post">
-        Input text:
-        <br/><textarea placeholder="Read &quot About &quot to know how to enter data correctly"
+        <textarea placeholder="Read &quot About &quot to know how to enter data correctly"
                        style="border: solid black 2px"
                        th:field="*{text}"
                        id="inputText"
                        rows="10" cols="38">
             </textarea>
-        <br/><button type="submit" name="action" value="generate">Generate</button>
+        <textarea placeholder="Make some updates with neighborhood list"
+                  style="border: solid black 2px"
+                  th:field="*{conversion}"
+                  id="conversion"
+                  rows="10" cols="38">
+            </textarea>
+    </select>
+        <br/>
+        <button type="submit" name="action" value="generate">Generate</button>
         <button type="submit" name="action" value="clear"> Clear</button>
         <select id="selectType" th:field="*{type}">
             <option th:each="type :${T(edu.graphs.input.Type).values()}"
@@ -73,6 +80,7 @@
                     th:text="${type.literal}">
             </option>
         </select>
+        <button type="submit" name="action" value="update">Update</button>
     </form>
 </div>
 
