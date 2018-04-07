@@ -2,18 +2,17 @@ package edu.graphs.service;
 
 import edu.graphs.constants.ParserConstants;
 import edu.graphs.converter.GraphConverter;
-import edu.graphs.input.Form;
 import edu.graphs.input.Input;
 import edu.graphs.input.Type;
 import edu.graphs.model.Edge;
 import edu.graphs.model.Graph;
 import edu.graphs.utils.GraphUtils;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -59,6 +58,7 @@ public class GraphService {
             }
             edgeService.addEdge(graph, createdVertices, nodes.get(0), nodes.get(1));
         }
+        checkCohesion(graph);
         GraphConverter.convertGraph(input, graph);
         return graph;
     }
@@ -74,7 +74,7 @@ public class GraphService {
         graph.getVertices().iterator().next();
         for (int sourceVertexPosition = 0; sourceVertexPosition < rows.size(); sourceVertexPosition++) {
             final List<String> elementsInRow =
-                Arrays.asList(rows.get(sourceVertexPosition).split(ParserConstants.WHITE_SPACE_SEPARATOR));
+                    Arrays.asList(rows.get(sourceVertexPosition).split(ParserConstants.WHITE_SPACE_SEPARATOR));
 
             for (int destVertexPosition = 0; destVertexPosition < elementsInRow.size(); destVertexPosition++) {
                 if ("1".equals(elementsInRow.get(destVertexPosition))) {
@@ -82,7 +82,7 @@ public class GraphService {
                 }
             }
         }
-
+        checkCohesion(graph);
         GraphConverter.convertGraph(input, graph);
 
         return graph;
@@ -92,6 +92,7 @@ public class GraphService {
         final Graph graph = new Graph();
         final List<String> lines = Arrays.asList(text.split(ParserConstants.NEW_LINE_SEPARATOR));
         lines.forEach(line -> convertNeighborhoodLine(graph, line));
+        checkCohesion(graph);
         return graph;
     }
 
@@ -101,5 +102,36 @@ public class GraphService {
         for (int destVertexPosition = 1; destVertexPosition < vertices.size(); destVertexPosition++) {
             edgeService.addEdge(graph, vertices, ParserConstants.MAIN_VERTEX_POSITION, destVertexPosition);
         }
+    }
+
+    private void findEulerCycle(final Graph graph) {
+        final int liczbaWierzcholkow = graph.getVertices().size();
+        final int liczbaKrawedzi = graph.getEdges().size();
+        List stos = new ArrayList();
+        List wierzcholki = graph.getVertices();
+        List<Edge> krawedzie = graph.getEdges();
+
+        stos.add(wierzcholki.get(0));
+        wierzcholki.remove(0);
+
+
+    }
+
+    private boolean checkCohesion(final Graph graph) {
+        for (String vertex : graph.getVertices()) {
+            List<Edge> edgesToVertex = new ArrayList<>();
+
+            for (Edge edge : graph.getEdges()) {
+                if (edge.getSource().equals(vertex) || edge.getDestination().equals(vertex)) {
+                    edgesToVertex.add(edge);
+                }
+            }
+            if ((edgesToVertex.size() % 2) != 0) {
+                System.out.println(String.format("******************\nGraf nie jest spójny, ponieważ wierzchołek %s posiada następującą liczbe krawędzi: %s.\n******************", vertex, edgesToVertex.size()));
+                return false;
+            }
+        }
+        System.out.println("******************\nGraf jest spójny.\n******************");
+        return true;
     }
 }
