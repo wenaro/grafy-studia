@@ -1,5 +1,6 @@
 package edu.graphs.controller;
 
+import edu.graphs.converter.NeighborhoodListConverter;
 import edu.graphs.input.Form;
 import edu.graphs.input.Input;
 import edu.graphs.input.Type;
@@ -45,6 +46,8 @@ public class GenerateController {
         this.input = input;
         graph = graphService.createGraph(input.getType(), input.getText(), input);
         addModelAttributes(model, input, new Form());
+        graphService.getSasiadow(graph, graph.getVertices().get(0));
+
         return "generate";
     }
 

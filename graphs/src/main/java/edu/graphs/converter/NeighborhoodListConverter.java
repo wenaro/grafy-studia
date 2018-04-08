@@ -26,6 +26,7 @@ public class NeighborhoodListConverter {
             stringBuilder.append(ParserConstants.NEW_LINE_SEPARATOR);
         }
 
+        System.out.println("+++++++++++++++++++++++ " + stringBuilder.toString());
         return stringBuilder.toString();
     }
 }

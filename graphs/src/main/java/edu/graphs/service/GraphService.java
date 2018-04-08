@@ -10,9 +10,8 @@ import edu.graphs.utils.GraphUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Component
 @AllArgsConstructor
@@ -93,6 +92,7 @@ public class GraphService {
         final List<String> lines = Arrays.asList(text.split(ParserConstants.NEW_LINE_SEPARATOR));
         lines.forEach(line -> convertNeighborhoodLine(graph, line));
         checkCohesion(graph);
+        DFS(graph);
         return graph;
     }
 
@@ -108,13 +108,90 @@ public class GraphService {
         final int liczbaWierzcholkow = graph.getVertices().size();
         final int liczbaKrawedzi = graph.getEdges().size();
         List stos = new ArrayList();
-        List wierzcholki = graph.getVertices();
+        List<String> wierzcholki = graph.getVertices();
         List<Edge> krawedzie = graph.getEdges();
+//
+//        stos.add(wierzcholki.get(0));
+//       // wierzcholki.remove(0);
+//
+//        for (String wierzcholek: wierzcholki){
+//            wierzcholek
+//        }
+        for (int i = 0; i < wierzcholki.size(); i++) {
+            if (i == 0) {
+                stos.add(wierzcholki.get(i));
+            }
+
+        }
+    }
+
+    private void DFS(Graph graph) {
+        final List<String> stos = new ArrayList<>();
+        final List<String> wierzcholki = graph.getVertices();
+        final List<String> odwiedzoneWierzcholki = new ArrayList<>();
 
         stos.add(wierzcholki.get(0));
-        wierzcholki.remove(0);
+        System.out.println("Dodano na stos: " + wierzcholki.get(0));
+
+        while (!stos.isEmpty()) {
+            final String v = stos.get(stos.size() - 1);
+            System.out.println("v: " + v);
+            if (czyOdwiedzony(v, odwiedzoneWierzcholki)) {
+                System.out.println(v + " juz bylo odwiedzone.");
+                break;
+            }
+            System.out.println(v + " nie jest odwiedzony.");
+            odwiedzoneWierzcholki.add(v);
+
+            System.out.println(stos.get(stos.size() - 1) + " usuniety ze stosu.");
+            Set<String> sasiedzi = getSasiadow(graph, stos.get(stos.size() - 1));
+            stos.remove(stos.size() - 1);
+
+            System.out.println("SPRAWDZENIE SASIADOW");
+            for (String sasiad : sasiedzi) {
+                if (!odwiedzoneWierzcholki.contains(sasiad)) {
+                    System.out.println("Sasiad " + sasiad + " nie jest odwiedzony.");
+                    stos.add(sasiad);
+                }
+            }
 
 
+            //    graph.getEdges().get(0).get
+
+        }
+        System.out.println("Stos jest pusty.");
+        if (odwiedzoneWierzcholki.size() == graph.getVertices().size()) {
+            System.out.println("Graf jest spojny poniewaz liczba odwiedzonych wierzchołkow=" + odwiedzoneWierzcholki.size() + " jest rowna wszystkim wierzcholkom= " + graph.getVertices().size());
+        } else {
+            System.out.println("Graf nie jest spojny poniewaz liczba odwiedzonych wierzchołkow=" + odwiedzoneWierzcholki.size() + " nie jest rowna wszystkim wierzcholkom= " + graph.getVertices().size());
+        }
+    }
+
+    public Set<String> getSasiadow(final Graph graph, String v) {
+        final Set<String> sasiedzi = new HashSet<>();
+        for (Edge edge : graph.getEdges()) {
+            //    System.out.println("Start: " + edge.getSource() + ", koniec: " + edge.getDestination());
+            if (edge.getDestination().equals(v)) {
+                sasiedzi.add(edge.getSource());
+
+            }
+            if (edge.getSource().equals(v)) {
+                sasiedzi.add(edge.getDestination());
+            }
+        }
+
+        Stream.of(sasiedzi).forEach(strings -> System.out.println(strings));
+        return sasiedzi;
+    }
+
+    private boolean czyOdwiedzony(String v, List<String> odwiedzoneWierzcholki) {
+        boolean odwiedzony = false;
+        for (String wierzcholek : odwiedzoneWierzcholki) {
+            if (v.equals(wierzcholek)) {
+                odwiedzony = true;
+            }
+        }
+        return odwiedzony;
     }
 
     private boolean checkCohesion(final Graph graph) {
