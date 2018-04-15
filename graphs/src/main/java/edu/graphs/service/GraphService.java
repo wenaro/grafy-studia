@@ -8,14 +8,14 @@ import edu.graphs.model.Edge;
 import edu.graphs.model.Graph;
 import edu.graphs.utils.GraphUtils;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class GraphService {
 
     private final EdgeService edgeService;
@@ -58,7 +58,6 @@ public class GraphService {
             }
             edgeService.addEdge(graph, createdVertices, nodes.get(0), nodes.get(1));
         }
-        checkCohesion(graph);
         GraphConverter.convertGraph(input, graph);
         return graph;
     }
@@ -82,7 +81,6 @@ public class GraphService {
                 }
             }
         }
-        checkCohesion(graph);
         GraphConverter.convertGraph(input, graph);
 
         return graph;
@@ -92,7 +90,7 @@ public class GraphService {
         final Graph graph = new Graph();
         final List<String> lines = Arrays.asList(text.split(ParserConstants.NEW_LINE_SEPARATOR));
         lines.forEach(line -> convertNeighborhoodLine(graph, line));
-        checkCohesion(graph);
+
         return graph;
     }
 
@@ -104,22 +102,127 @@ public class GraphService {
         }
     }
 
-    private void findEulerCycle(final Graph graph) {
-        final int liczbaWierzcholkow = graph.getVertices().size();
-        final int liczbaKrawedzi = graph.getEdges().size();
-        List stos = new ArrayList();
-        List wierzcholki = graph.getVertices();
-        List<Edge> krawedzie = graph.getEdges();
-
-        stos.add(wierzcholki.get(0));
-        wierzcholki.remove(0);
-
-
+    public String checkIfEulerCycleExist(final Graph graph) {
+        String response;
+        if (!isEvenNumberOfEdges(graph)) {
+            response = "Cykl Eulera nie istnieje ponieważ wierzchołki w grafie nie posiadają parzystej liczby krawedzi.";
+        } else if (!isCohesion(graph)) {
+            response = "Cykl Eulera nie istnieje ponieważ graf nie jest spójny.";
+        } else {
+            response = findEulerCycle(graph);
+        }
+        return response;
     }
 
-    private boolean checkCohesion(final Graph graph) {
+    private String findEulerCycle(final Graph sourceGraph) {
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~ Szukanie Cyklu Eulera ~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        final Graph graph = new Graph();
+        copyGraph(sourceGraph, graph);
+
+        final List<String> stack = new ArrayList();
+        final List<String> vertices = graph.getVertices();
+        final List<Edge> edges = graph.getEdges();
+        final List<String> cycle = new ArrayList<>();
+
+        stack.add(vertices.get(0));
+        while (!stack.isEmpty()) {
+            String currentVertex = stack.get(stack.size() - 1);
+
+            while (!getNeighbors(graph, currentVertex).isEmpty()) {
+                final String nextVertex = getNeighbors(graph, currentVertex).iterator().next();
+                edges.remove(findEdge(currentVertex, nextVertex, graph));
+                currentVertex = nextVertex;
+                stack.add(currentVertex);
+            }
+            cycle.add(currentVertex);
+            stack.remove(stack.size() - 1);
+        }
+
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~ Cykl Eulera: ");
+        cycle.forEach(System.out::println);
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~ Koniec szukania Cyklu Eulera ~~~~~~~~~~~~~~~~~~~~~");
+
+        return "Cykl Eulera: " + String.join(", ", cycle);
+    }
+
+    private void copyGraph(Graph orginalGraph, Graph graph) {
+        graph.getVertices().addAll(orginalGraph.getVertices());
+        graph.getEdges().addAll(orginalGraph.getEdges());
+    }
+
+    private boolean isCohesion(Graph graph) {
+        final List<String> stack = new ArrayList<>();
+        final List<String> vertices = graph.getVertices();
+        final List<String> visitedVertices = new ArrayList<>();
+        boolean isCohesion;
+
+        stack.add(vertices.get(0));
+
+        while (!stack.isEmpty()) {
+            final String v = stack.get(stack.size() - 1);
+            if (isVisited(v, visitedVertices)) {
+                break;
+            }
+            visitedVertices.add(v);
+            Set<String> sasiedzi = getNeighbors(graph, stack.get(stack.size() - 1));
+            stack.remove(stack.size() - 1);
+            for (String sasiad : sasiedzi) {
+                if (!visitedVertices.contains(sasiad)) {
+                    stack.add(sasiad);
+                }
+            }
+        }
+        if (visitedVertices.size() == graph.getVertices().size()) {
+            System.out.println("Graf jest spojny poniewaz liczba odwiedzonych wierzchołkow=" + visitedVertices.size() + " jest rowna wszystkim wierzcholkom= " + graph.getVertices().size());
+            isCohesion = true;
+        } else {
+            System.out.println("Graf nie jest spojny poniewaz liczba odwiedzonych wierzchołkow=" + visitedVertices.size() + " nie jest rowna wszystkim wierzcholkom= " + graph.getVertices().size());
+            isCohesion = false;
+        }
+
+        return isCohesion;
+    }
+
+    private Edge findEdge(final String vertexA, final String vertexB, final Graph graph) {
+        final List<Edge> edges = graph.getEdges();
+
+        for (final Edge edge : edges) {
+            if ((edge.getSource().equals(vertexA) && edge.getDestination().equals(vertexB)) || (edge.getSource().equals(vertexB) && edge.getDestination().equals(vertexA))) {
+                return edge;
+            }
+        }
+        return null;
+    }
+
+    private Set<String> getNeighbors(final Graph graph, String v) {
+        final Set<String> neighbors = new HashSet<>();
+        for (final Edge edge : graph.getEdges()) {
+            if (edge.getDestination().equals(v)) {
+                neighbors.add(edge.getSource());
+            }
+            if (edge.getSource().equals(v)) {
+                neighbors.add(edge.getDestination());
+            }
+        }
+
+        neighbors.forEach(System.out::println);
+        return neighbors;
+    }
+
+    private boolean isVisited(String v, List<String> visitedVertices) {
+        boolean isVisited = false;
+        for (final String vertex : visitedVertices) {
+            if (v.equals(vertex)) {
+                isVisited = true;
+            }
+        }
+
+        return isVisited;
+    }
+
+    private boolean isEvenNumberOfEdges(final Graph graph) {
         for (String vertex : graph.getVertices()) {
-            List<Edge> edgesToVertex = new ArrayList<>();
+            final List<Edge> edgesToVertex = new ArrayList<>();
 
             for (Edge edge : graph.getEdges()) {
                 if (edge.getSource().equals(vertex) || edge.getDestination().equals(vertex)) {
@@ -127,11 +230,11 @@ public class GraphService {
                 }
             }
             if ((edgesToVertex.size() % 2) != 0) {
-                System.out.println(String.format("******************\nGraf nie jest spójny, ponieważ wierzchołek %s posiada następującą liczbe krawędzi: %s.\n******************", vertex, edgesToVertex.size()));
+                System.out.println(String.format("****************** Graf nie jest spójny, ponieważ wierzchołek %s posiada następującą liczbe krawędzi: %s. ******************", vertex, edgesToVertex.size()));
                 return false;
             }
         }
-        System.out.println("******************\nGraf jest spójny.\n******************");
+        System.out.println("****************** Graf jest spójny. ******************");
         return true;
     }
 }

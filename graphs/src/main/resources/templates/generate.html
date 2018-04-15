@@ -83,7 +83,7 @@
         <button type="submit" name="action" value="update">Update</button>
     </form>
 </div>
-
+<center><p th:text="${euler}"></p></center>
 <form th:action="@{/vertex}" th:object="${form}" method="post">
     <div class="container">
         <input th:field="*{vertex}" placeholder="Name"/>
