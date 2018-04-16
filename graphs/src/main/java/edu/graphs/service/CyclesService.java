@@ -2,12 +2,11 @@ package edu.graphs.service;
 
 import edu.graphs.model.Edge;
 import edu.graphs.model.Graph;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CyclesService {
@@ -15,7 +14,8 @@ public class CyclesService {
     public String checkIfEulerCycleExist(final Graph graph) {
         String response;
         if (!isEvenNumberOfEdges(graph)) {
-            response = "Cykl Eulera nie istnieje ponieważ wierzchołki w grafie nie posiadają parzystej liczby krawedzi.";
+            response =
+                "Cykl Eulera nie istnieje ponieważ wierzchołki w grafie nie posiadają parzystej liczby krawedzi.";
         } else if (!isCohesion(graph)) {
             response = "Cykl Eulera nie istnieje ponieważ graf nie jest spójny.";
         } else {
@@ -24,12 +24,14 @@ public class CyclesService {
         return response;
     }
 
-    public String checkIfHamiltonianCycleExist(final int verticesCount, final Graph graph, final String currentVertex, final List<String> visitedVertices, final List<String> stack) {
+    public String checkIfHamiltonianCycleExist(final int verticesCount, final Graph graph, final String currentVertex,
+                                               final List<String> visitedVertices, final List<String> stack) {
         String response;
         if (!isCohesion(graph)) {
             response = "Cykl Hamiltona nie istnieje ponieważ graf nie jest spójny.";
         } else {
-            response = findHamiltonCycle(graph.getVertices().size(), graph, graph.getVertices().get(0), visitedVertices, stack);
+            response = findHamiltonCycle(graph.getVertices().size(), graph, graph.getVertices().get(0), visitedVertices,
+                stack);
         }
         return response;
     }
@@ -88,10 +90,13 @@ public class CyclesService {
             }
         }
         if (visitedVertices.size() == graph.getVertices().size()) {
-            System.out.println("Graf jest spojny poniewaz liczba odwiedzonych wierzchołkow=" + visitedVertices.size() + " jest rowna wszystkim wierzcholkom= " + graph.getVertices().size());
+            System.out.println("Graf jest spojny poniewaz liczba odwiedzonych wierzchołkow=" + visitedVertices.size()
+                + " jest rowna wszystkim wierzcholkom= " + graph.getVertices().size());
             isCohesion = true;
         } else {
-            System.out.println("Graf nie jest spojny poniewaz liczba odwiedzonych wierzchołkow=" + visitedVertices.size() + " nie jest rowna wszystkim wierzcholkom= " + graph.getVertices().size());
+            System.out.println(
+                "Graf nie jest spojny poniewaz liczba odwiedzonych wierzchołkow=" + visitedVertices.size()
+                    + " nie jest rowna wszystkim wierzcholkom= " + graph.getVertices().size());
             isCohesion = false;
         }
 
@@ -143,15 +148,17 @@ public class CyclesService {
         final List<Edge> edges = graph.getEdges();
 
         for (final Edge edge : edges) {
-            if ((edge.getSource().equals(vertexA) && edge.getDestination().equals(vertexB)) || (edge.getSource().equals(vertexB) && edge.getDestination().equals(vertexA))) {
+            if ((edge.getSource().equals(vertexA) && edge.getDestination().equals(vertexB)) || (
+                edge.getSource().equals(vertexB) && edge.getDestination().equals(vertexA))) {
                 return edge;
             }
         }
         return null;
     }
 
-    public String findHamiltonCycle(final int verticesCount, final Graph graph, final String currentVertex, List<String> visitedVertices, final List<String> stack) {
-        boolean test;
+    public String findHamiltonCycle(final int verticesCount, final Graph graph, final String currentVertex,
+                                    List<String> visitedVertices, final List<String> stack) {
+        boolean isCycle;
         String cycle;
 
         stack.add(currentVertex);
@@ -169,25 +176,25 @@ public class CyclesService {
                 neighbors.remove(neighbor);
             }
         }
-        test = false;
+        isCycle = false;
         Set<String> neighbors = getNeighbors(graph, currentVertex);
         while (neighbors.iterator().hasNext()) {
             String u = neighbors.iterator().next();
 
             if (u.equals(graph.getVertices().get(0))) {
-                test = true;
+                isCycle = true;
                 break;
             }
             neighbors.remove(u);
         }
-        if (test == true) {
+        if (isCycle) {
             cycle = "Cykl Hamiltona: ";
         } else {
             cycle = "Sciezka Hamiltona: ";
         }
         stack.forEach(System.out::println);
-        cycle = cycle + String.join(", ", stack);
-        if (test = true) {
+        cycle = cycle + String.join(", ", stack) + ", " + stack.get(0);
+        if (isCycle) {
             System.out.println(stack.iterator().next());
         }
 
@@ -195,4 +202,27 @@ public class CyclesService {
 
         return cycle;
     }
+
+    //wrzuc na jakiegos brancha roboczego, ja w domu ogarne to do konca
+    public String znajdzKrytycznaKrawedz(final Graph graph) {
+        final List<Edge> krawedzie = new ArrayList<>(graph.getEdges());
+        int i = 0;
+
+        final List<Edge> krytyczneKrawedzie = new ArrayList<>();
+        while (i < krawedzie.size()) {
+            final Edge krawedz = krawedzie.get(i);
+            graph.getEdges().remove(krawedz);
+            System.out.println("________________________________________________________________________");
+            if (!isCohesion(graph)) {
+                krytyczneKrawedzie.add(krawedz);
+                System.out.println("Krytyczna krawedz: " + krawedz.getSource() + krawedz.getDestination());
+
+            }
+            graph.getEdges().add(krawedz);
+            i++;
+        }
+
+        return null;
+    }
+
 }

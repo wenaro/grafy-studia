@@ -52,7 +52,7 @@ public class GenerateController {
         graph = graphService.createGraph(input.getType(), input.getText(), input);
 
         addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()));
-
+        cyclesService.znajdzKrytycznaKrawedz(graph);
         return "generate";
     }
 
