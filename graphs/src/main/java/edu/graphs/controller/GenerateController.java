@@ -40,7 +40,7 @@ public class GenerateController {
 
     @GetMapping("/graph")
     public String generate(final Model model) {
-        addModelAttributes(model, new Input(), new Form(), null, null, null);
+        addModelAttributes(model, new Input(), new Form(), null, null, null, null);
         return "generate";
     }
 
@@ -50,8 +50,8 @@ public class GenerateController {
         this.input = input;
         graph = graphService.createGraph(input.getType(), input.getText(), input);
 
-        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph));
-        cyclesService.znajdzKrytycznaKrawedz(graph);
+        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph), graphSearchingService.findCriticalEdges(graph));
+        graphSearchingService.findCriticalEdges(graph);
 
         return "generate";
     }
@@ -60,7 +60,7 @@ public class GenerateController {
             params = "action=clear")
     public String clearGraph(final Model model, @ModelAttribute final Input input) {
         graph = new Graph();
-        addModelAttributes(model, input, new Form(), null, null, graphSearchingService.DFS(graph));
+        addModelAttributes(model, input, new Form(), null, null, null, null);
         return "generate";
     }
 
@@ -68,7 +68,7 @@ public class GenerateController {
             params = "action=update")
     public String updateGraph(final Model model, @ModelAttribute final Input input) {
         graph = graphService.createGraph(Type.NEIGHBORHOOD_LIST, input.getConversion(), input);
-        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph));
+        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph), graphSearchingService.findCriticalEdges(graph));
 
         return "generate";
     }
@@ -77,7 +77,7 @@ public class GenerateController {
             params = "action=add")
     public String addVertex(final Model model, @ModelAttribute final Form form) {
         graph.addVertex(form.getVertex());
-        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph));
+        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph), graphSearchingService.findCriticalEdges(graph));
 
         return "generate";
     }
@@ -86,7 +86,7 @@ public class GenerateController {
             params = "action=update")
     public String updateVertex(final Model model, @ModelAttribute final Form form) {
         vertexService.updateVertex(graph, form);
-        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph));
+        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph),graphSearchingService.findCriticalEdges(graph));
 
         return "generate";
     }
@@ -95,7 +95,7 @@ public class GenerateController {
             params = "action=remove")
     public String removeVertex(final Model model, @ModelAttribute final Form form) {
         vertexService.removeVertex(graph, form);
-        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph));
+        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph), graphSearchingService.findCriticalEdges(graph));
         return "generate";
     }
 
@@ -103,7 +103,7 @@ public class GenerateController {
             params = "action=add")
     public String addEdge(final Model model, @ModelAttribute final Form form) {
         edgeService.addFormEdge(graph, form);
-        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph));
+        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph), graphSearchingService.findCriticalEdges(graph));
 
         return "generate";
     }
@@ -112,19 +112,20 @@ public class GenerateController {
             params = "action=remove")
     public String removeEdge(final Model model, @ModelAttribute final Form form) {
         edgeService.removeEdge(graph, form);
-        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph));
+        addModelAttributes(model, input, new Form(), cyclesService.checkIfEulerCycleExist(graph), cyclesService.checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0), new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph), graphSearchingService.findCriticalEdges(graph));
 
         return "generate";
     }
 
-    private void addModelAttributes(final Model model, final Input input, final Form form, final String euler, final String hamilton, final String DFS) {
+    private void addModelAttributes(final Model model, final Input input, final Form form, final String euler, final String hamilton, final String DFS, final String criticalEdges) {
         model.addAttribute("input", input);
         model.addAttribute("vertices", graph.getVertices());
         model.addAttribute("edges", graph.getEdges());
         model.addAttribute("form", form);
-        //  model.addAttribute("euler", euler);
-        //   model.addAttribute("hamilton", hamilton);
+//        model.addAttribute("euler", euler);
+//        model.addAttribute("hamilton", hamilton);
         model.addAttribute("DFS", DFS);
+        model.addAttribute("criticalEdges", criticalEdges);
     }
 
 }

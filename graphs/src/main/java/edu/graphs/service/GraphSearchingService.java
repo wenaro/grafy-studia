@@ -12,31 +12,39 @@ import java.util.Set;
 @Component
 public class GraphSearchingService {
 
-    public List<Edge> findCriticalEdges(final Graph graph) {
-        final List<String> vertices = graph.getVertices();
-        final List<Edge> edges = graph.getEdges();
+    public String findCriticalEdges(final Graph graph) {
+        final List<Edge> edges = new ArrayList<>(graph.getEdges());
+        final List<String> criticalEdges = new ArrayList<>();
 
+        for (final Edge edge : edges) {
+            graph.getEdges().remove(edge);
+            if (DFS(graph).split("->").length != graph.getVertices().size()) {
+                criticalEdges.add(edge.getSource() + edge.getDestination());
+            }
+            graph.getEdges().add(edge);
+        }
 
-        return null;
+        return "Krawedzie krytyczne: " + String.join(", ", criticalEdges);
     }
+
 
     public void findBridges() {
 
     }
 
 
-    public String DFS(Graph graph) {
+    public String DFS(final Graph graph) {
         final List<String> stack = new ArrayList<>();
         final List<String> vertices = graph.getVertices();
         final List<String> visitedVertices = new ArrayList<>();
-        boolean isCohesion;
 
         stack.add(vertices.get(0));
 
         while (!stack.isEmpty()) {
             final String v = stack.get(stack.size() - 1);
             if (isVisited(v, visitedVertices)) {
-                break;
+                stack.remove(stack.size() - 1);
+                continue;
             }
             visitedVertices.add(v);
             Set<String> sasiedzi = getNeighbors(graph, stack.get(stack.size() - 1));
@@ -48,10 +56,6 @@ public class GraphSearchingService {
             }
         }
 
-//        for (String vertex :
-//                visitedVertices) {
-//            System.out.println(vertex);
-//        }
         return "Przeszukiwanie w głąb(DFS): " + String.join("->", visitedVertices);
     }
 
