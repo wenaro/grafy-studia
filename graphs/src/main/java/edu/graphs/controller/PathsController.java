@@ -20,7 +20,7 @@ public class PathsController {
 
     @GetMapping("/paths")
     public String get(final Model model) {
-        addModelAttributes(model, new VertexInput());
+        addModelAttributes(model, new VertexInput(), "");
         return "paths";
     }
 
@@ -35,15 +35,16 @@ public class PathsController {
         for (final String path : paths) {
             pathsSB.append(path).append("\n");
         }
-        vertexInput.setPath(pathsSB.toString());
-        addModelAttributes(model, vertexInput);
+        addModelAttributes(model, new VertexInput(), pathsSB.toString());
+        System.out.println(pathsSB.toString());
 
         return "paths";
     }
 
-    private void addModelAttributes(final Model model, final VertexInput vertexInput) {
+    private void addModelAttributes(final Model model, final VertexInput vertexInput, final String paths) {
         model.addAttribute("vertexInput", vertexInput);
         model.addAttribute("vertices", GraphKeeper.graph.getVertices());
         model.addAttribute("edges", GraphKeeper.graph.getEdges());
+        model.addAttribute("paths", paths);
     }
 }

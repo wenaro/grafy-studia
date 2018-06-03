@@ -81,7 +81,7 @@ public class GraphService {
 
         for (int i = 0; i < nodeCount; i++) {
             final Vertex vertex = new Vertex(String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase(),
-                String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase(), Color.BLUE.getColor());
+                String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase(), null);
             graph.addVertex(vertex);
         }
 
@@ -110,7 +110,7 @@ public class GraphService {
 
         for (int i = 0; i < rows.size(); i++) {
             final Vertex vertex = new Vertex(String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase(),
-                String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase(), Color.BLUE.getColor());
+                String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase(), null);
             graph.addVertex(vertex);
         }
 
@@ -140,7 +140,7 @@ public class GraphService {
 
     private void convertNeighborhoodLine(final Graph graph, final String line) {
         final List<String> vertices = Arrays.asList(line.split(ParserConstants.ARROW_SEPARATOR));
-        vertices.forEach(vertex -> graph.addVertex(new Vertex(vertex, vertex, Color.BLUE.getColor())));
+        vertices.forEach(vertex -> graph.addVertex(new Vertex(vertex, vertex, null  )));
         for (int destVertexPosition = 1; destVertexPosition < vertices.size(); destVertexPosition++) {
             edgeService.addEdge(graph, graph.getVertices(), ParserConstants.MAIN_VERTEX_POSITION, destVertexPosition);
         }
@@ -173,6 +173,10 @@ public class GraphService {
     }
 
     public Graph calculateShortestPathFromSource(Graph graph, Vertex source) {
+        graph.getVertices().forEach(v -> v.getShortestPath().clear());
+        graph.getVertices().forEach(v->v.getAdjacentNodes().clear());
+        graph.getVertices().forEach(v->v.setDistance(Integer.MAX_VALUE));
+
         addAdjacencyVertexesToEachVertex(graph);
         source.setDistance(0);
 

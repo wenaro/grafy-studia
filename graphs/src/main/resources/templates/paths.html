@@ -58,20 +58,13 @@
 
 <div class="container">
     <form action="/" th:action="@{/paths}" th:object="${vertexInput}" method="post">
-        <textarea disabled placeholder="Lets find some fuc.. paths"
-                  style="border: solid black 2px"
-                  th:field="*{path}"
-                  id="vertexInput"
-                  rows="10" cols="38">
-            </textarea>
-        <br/>
-
         <div class="container">
             <input th:field="*{id}" placeholder="Vertex name"/>
             <button type="submit" name="action" value="find">Find</button>
         </div>
     </form>
 </div>
+<center><textarea disabled rows="15" cols="150" th:text="${paths}"></textarea></center>
 
 
 

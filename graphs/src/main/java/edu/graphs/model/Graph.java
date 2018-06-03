@@ -18,9 +18,9 @@ public class Graph {
         if (edges.contains(edge)) {
             edges.remove(edge);
         }
-        if (edges.contains(reversedEdge)) {
+/*        if (edges.contains(reversedEdge)) {
             edges.remove(reversedEdge);
-        }
+        }*/
         edges.add(edge);
 
     }
