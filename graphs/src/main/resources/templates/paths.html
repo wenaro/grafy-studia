@@ -57,73 +57,23 @@
 </ul>
 
 <div class="container">
-    <form action="/" th:action="@{/graph}" th:object="${input}" method="post">
-        <textarea placeholder="Read &quot About &quot to know how to enter data correctly"
-                       style="border: solid black 2px"
-                       th:field="*{text}"
-                       id="inputText"
-                       rows="10" cols="38">
-            </textarea>
-        <textarea placeholder="Make some updates with neighborhood list"
+    <form action="/" th:action="@{/paths}" th:object="${vertexInput}" method="post">
+        <textarea disabled placeholder="Lets find some fuc.. paths"
                   style="border: solid black 2px"
-                  th:field="*{conversion}"
-                  id="conversion"
+                  th:field="*{path}"
+                  id="vertexInput"
                   rows="10" cols="38">
             </textarea>
-    </select>
         <br/>
-        <button type="submit" name="action" value="generate">Generate</button>
-        <button type="submit" name="action" value="clear"> Clear</button>
-        <select id="selectType" th:field="*{type}">
-            <option th:each="type :${T(edu.graphs.input.Type).values()}"
-                    th:value="${type}"
-                    th:text="${type.literal}">
-            </option>
-        </select>
-        <select id="orderType" th:field="*{orderType}">
-            <option th:each="oderType :${T(edu.graphs.model.OrderType).values()}"
-                    th:value="${oderType}"
-                    th:text="${oderType.literal}">
-            </option>
-        </select>
-        <button type="submit" name="action" value="update">Update</button>
+
+        <div class="container">
+            <input th:field="*{id}" placeholder="Vertex name"/>
+            <button type="submit" name="action" value="find">Find</button>
+        </div>
     </form>
 </div>
-<center><p th:text="${euler}"></p></center>
-<center><p th:text="${hamilton}"></p></center>
-<center><p th:text="${DFS}"></p></center>
-<center><p th:text="${criticalEdges}"></p></center>
 
 
-<form th:action="@{/vertex}" th:object="${form}" method="post">
-    <div class="container">
-        <input th:field="*{vertex}" placeholder="Name"/>
-
-        <button type="submit" name="action" value="add">Add</button>
-        <button type="submit" name="action" value="remove">Remove</button>
-    </div>
-</form>
-
-<form th:action="@{/update}" th:object="${form}" method="post">
-    <div class="container">
-        <input th:field="*{oldName}" placeholder="Old name"/>
-        <input th:field="*{newName}" placeholder="New name"/>
-
-        <button type="submit" name="action" value="update">Update</button>
-    </div>
-</form>
-
-<form th:action="@{/edge}" th:object="${form}" method="post">
-    <div class="container">
-        <input th:field="*{source}" placeholder="Source"/>
-        <input th:field="*{destination}" placeholder="Destination"/>
-        <input th:field="*{label}" placeholder="Label"/>
-        <input th:field="*{weight}" placeholder="Weight"/>
-
-        <button type="submit" name="action" value="add">Add</button>
-        <button type="submit" name="action" value="remove">Remove</button>
-    </div>
-</form>
 
 
 <div id="cy"></div>

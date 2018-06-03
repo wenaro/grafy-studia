@@ -16,15 +16,24 @@ public class EdgeService {
                         final int destinationVertexPosition) {
         final Vertex source = vertices.get(sourceVertexPosition);
         final Vertex destination = vertices.get(destinationVertexPosition);
+        final int weigth = new Random().nextInt(100) + 1;
         final Edge edge =
             new Edge(createEdgeLabel(source.getId(), destination.getId()), source.getId(), destination.getId(),
-                new Random().nextInt(100) + 1);
+                weigth);
+        final Edge edgeReversed =
+            new Edge(createEdgeLabel(destination.getId(), source.getId()), destination.getId(), source.getId(),
+                weigth);
         graph.addEdge(edge);
+        graph.addEdge(edgeReversed);
     }
 
     public void addFormEdge(final Graph graph, final Form form) {
         final Edge edge = new Edge(form.getLabel(), form.getSource(), form.getDestination(), form.getWeight());
+        final Edge edgeReversed = new Edge(form.getLabel(), form.getDestination(), form.getSource(), form.getWeight());
+
         graph.addEdge(edge);
+        graph.addEdge(edgeReversed);
+
     }
 
     public void removeEdge(final Graph graph, final Form form) {

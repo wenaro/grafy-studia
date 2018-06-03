@@ -4,6 +4,7 @@ import edu.graphs.input.Form;
 import edu.graphs.input.Input;
 import edu.graphs.input.Type;
 import edu.graphs.model.Graph;
+import edu.graphs.model.GraphKeeper;
 import edu.graphs.model.OrderType;
 import edu.graphs.service.EdgeService;
 import edu.graphs.service.GraphSearchingService;
@@ -56,7 +57,7 @@ public class GenerateController {
     public String submitInput(final Model model, @ModelAttribute final Input input) {
         this.input = input;
         graph = graphService.createGraph(input.getOrderType(), input.getType(), input.getText(), input);
-
+        GraphKeeper.graph = graph;
         addModelAttributes(model, input, new Form()/*, cyclesService.checkIfEulerCycleExist(graph), cyclesService
                 .checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0),
             new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph), graphSearchingService
@@ -70,6 +71,7 @@ public class GenerateController {
                  params = "action=clear")
     public String clearGraph(final Model model, @ModelAttribute final Input input) {
         graph = new Graph();
+        GraphKeeper.graph = graph;
         addModelAttributes(model, input, new Form()/*, null, null, null, null*/);
         return "generate";
     }
@@ -78,6 +80,7 @@ public class GenerateController {
                  params = "action=update")
     public String updateGraph(final Model model, @ModelAttribute final Input input) {
         graph = graphService.createGraph(OrderType.MATRIX, Type.NEIGHBORHOOD_LIST, input.getConversion(), input);
+        GraphKeeper.graph = graph;
         addModelAttributes(model, input, new Form()/*x cyclesService.checkIfEulerCycleExist(graph), cyclesService
                 .checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0),
             new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph), graphSearchingService
@@ -90,6 +93,7 @@ public class GenerateController {
                  params = "action=add")
     public String addVertex(final Model model, @ModelAttribute final Form form) {
         graph.addVertex(form.getVertex());
+        GraphKeeper.graph = graph;
         addModelAttributes(model, input, new Form()/*, cyclesService.checkIfEulerCycleExist(graph), cyclesService
                 .checkIfHamiltonianCycleExist(graph.getVertices().size(), graph, graph.getVertices().get(0),
                     new ArrayList<>(), new ArrayList<>()), graphSearchingService.DFS(graph),

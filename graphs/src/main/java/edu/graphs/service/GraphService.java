@@ -61,10 +61,6 @@ public class GraphService {
         }
 
         colorService.makeGraphColored(graph);
-
-        //TODO ZWRACA SCIEZKE Z WAGA TRZEBA TYLKO PRZEKAZAC WIERZCHOLEK Z FRONTU JAKO DRUGI ARGUMENT I ZROBIC POLE
-        // GDZIE SIE BEDZIE TO WPISYWAC
-        getTheShortestPathsToEachVertexFromSelected(graph, graph.getVertices().get(0));
         return graph;
     }
 
@@ -150,7 +146,15 @@ public class GraphService {
         }
     }
 
-    private List<String> getTheShortestPathsToEachVertexFromSelected(Graph graph, Vertex source) {
+    public Vertex findVertexById(final Graph graph, final String id){
+        for (Vertex v : graph.getVertices()) {
+            if(id.equals(v.getId())){
+                return v;
+            }
+        }
+        throw new RuntimeException("Nie ma takiego wierzcholka");
+    }
+    public List<String> getTheShortestPathsToEachVertexFromSelected(Graph graph, Vertex source) {
         calculateShortestPathFromSource(graph, source);
 
         final List<String> pathsWithWeight = new ArrayList<>();
