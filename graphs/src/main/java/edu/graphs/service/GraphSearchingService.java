@@ -2,6 +2,7 @@ package edu.graphs.service;
 
 import edu.graphs.model.Edge;
 import edu.graphs.model.Graph;
+import edu.graphs.model.Vertex;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -28,17 +29,12 @@ public class GraphSearchingService {
     }
 
 
-    public void findBridges() {
-
-    }
-
-
     public String DFS(final Graph graph) {
         final List<String> stack = new ArrayList<>();
-        final List<String> vertices = graph.getVertices();
+        final List<Vertex> vertices = graph.getVertices();
         final List<String> visitedVertices = new ArrayList<>();
 
-        stack.add(vertices.get(0));
+        stack.add(vertices.get(0).getId());
 
         while (!stack.isEmpty()) {
             final String v = stack.get(stack.size() - 1);

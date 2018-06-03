@@ -80,6 +80,12 @@
                     th:text="${type.literal}">
             </option>
         </select>
+        <select id="orderType" th:field="*{orderType}">
+            <option th:each="oderType :${T(edu.graphs.model.OrderType).values()}"
+                    th:value="${oderType}"
+                    th:text="${oderType.literal}">
+            </option>
+        </select>
         <button type="submit" name="action" value="update">Update</button>
     </form>
 </div>
@@ -128,12 +134,14 @@
 
 
     for (var i = 0; i < vertices.length; i++) {
+        var vertex = vertices[i];
         verticesArray.push(
             {
                 group: "nodes",
                 data: {
-                    id: vertices[i],
-                    label: vertices[i]
+                    id: vertex.id,
+                    label: vertex.label,
+                    backgroundColor: vertex.color
                 }
             }
         );
@@ -152,6 +160,7 @@
                     target: edge.destination,
                     weight: edge.weight,
                     label: edge.label
+
                 }
             }
         );
@@ -167,7 +176,7 @@
             .selector('node')
             .css({
                 'content': 'data(label)',
-                'background-color': 'blue'
+                'background-color': 'data(backgroundColor)'
             })
             .selector('edge')
             .css({

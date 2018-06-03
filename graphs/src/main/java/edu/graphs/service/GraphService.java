@@ -4,15 +4,21 @@ import edu.graphs.constants.ParserConstants;
 import edu.graphs.converter.GraphConverter;
 import edu.graphs.input.Input;
 import edu.graphs.input.Type;
+import edu.graphs.model.Color;
 import edu.graphs.model.Graph;
+import edu.graphs.model.OrderType;
+import edu.graphs.model.Vertex;
 import edu.graphs.utils.GraphUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -21,16 +27,48 @@ public class GraphService {
 
     private final EdgeService edgeService;
 
-    public Graph createGraph(final Type type, final String text, final Input input) {
+    private final ColorService colorService;
+
+    private GraphSearchingService graphSearchingService;
+
+    public Graph createGraph(final OrderType orderType, final Type type, final String text, final Input input) {
+        Graph graph;
         switch (type) {
             case NEIGHBORHOOD_MATRIX:
-                return createFromNeighborhoodMatrix(text, input);
+                graph = createFromNeighborhoodMatrix(text, input);
+                break;
             case INCIDENCE_MATRIX:
-                return createFromIncidenceMatrix(text, input);
+                graph = createFromIncidenceMatrix(text, input);
+                break;
             case NEIGHBORHOOD_LIST:
             default:
-                return createFromNeighborhoodList(text);
+                graph = createFromNeighborhoodList(text);
+                break;
         }
+
+        switch (orderType) {
+            case DEGREE:
+                graph.getVertices().sort(degreeComparator(graph));
+                break;
+            case RANDOM:
+                Collections.shuffle(graph.getVertices());
+                break;
+            case MATRIX:
+                graph.getVertices().sort(Comparator.comparing(Vertex::getId));
+        }
+
+        colorService.makeGraphColored(graph);
+        System.out.println(graphSearchingService.DFS(graph));
+        return graph;
+    }
+
+    private Comparator<Vertex> degreeComparator(final Graph graph) {
+        return (o1, o2) -> countDegree(graph, o2).compareTo(countDegree(graph, o1));
+    }
+
+    private Integer countDegree(final Graph graph, final Vertex vertex) {
+        final Set<Vertex> neighbours = colorService.getNeighbors(graph, vertex);
+        return neighbours.size();
     }
 
     private Graph createFromIncidenceMatrix(final String matrix, final Input input) {
@@ -40,10 +78,11 @@ public class GraphService {
         final int edgeCount = rows.get(0).split(ParserConstants.WHITE_SPACE_SEPARATOR).length;
 
         for (int i = 0; i < nodeCount; i++) {
-            graph.addVertex(String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase());
+            final Vertex vertex = new Vertex(String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase(),
+                String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase(), Color.BLUE.getColor());
+            graph.addVertex(vertex);
         }
 
-        final List<String> createdVertices = new ArrayList<>(graph.getVertices());
         final String[][] matrixArray = new String[nodeCount][edgeCount];
         GraphUtils.fillMatrixArray(rows, matrixArray);
 
@@ -57,7 +96,7 @@ public class GraphService {
                     break;
                 }
             }
-            edgeService.addEdge(graph, createdVertices, nodes.get(0), nodes.get(1));
+            edgeService.addEdge(graph, graph.getVertices(), nodes.get(0), nodes.get(1));
         }
         GraphConverter.convertGraph(input, graph);
         return graph;
@@ -68,17 +107,20 @@ public class GraphService {
         final Graph graph = new Graph();
 
         for (int i = 0; i < rows.size(); i++) {
-            graph.addVertex(String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase());
+            final Vertex vertex = new Vertex(String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase(),
+                String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase(), Color.BLUE.getColor());
+            graph.addVertex(vertex);
         }
-        final List<String> createdVertices = new ArrayList<>(graph.getVertices());
+        final List<String> createdVertices = new ArrayList<>();
+      //  graph.getVertices().forEach(x -> createdVertices.add(x.getId()));
         graph.getVertices().iterator().next();
         for (int sourceVertexPosition = 0; sourceVertexPosition < rows.size(); sourceVertexPosition++) {
             final List<String> elementsInRow =
-                    Arrays.asList(rows.get(sourceVertexPosition).split(ParserConstants.WHITE_SPACE_SEPARATOR));
+                Arrays.asList(rows.get(sourceVertexPosition).split(ParserConstants.WHITE_SPACE_SEPARATOR));
 
             for (int destVertexPosition = 0; destVertexPosition < elementsInRow.size(); destVertexPosition++) {
                 if ("1".equals(elementsInRow.get(destVertexPosition))) {
-                    edgeService.addEdge(graph, createdVertices, sourceVertexPosition, destVertexPosition);
+                    edgeService.addEdge(graph, graph.getVertices(), sourceVertexPosition, destVertexPosition);
                 }
             }
         }
@@ -97,9 +139,9 @@ public class GraphService {
 
     private void convertNeighborhoodLine(final Graph graph, final String line) {
         final List<String> vertices = Arrays.asList(line.split(ParserConstants.ARROW_SEPARATOR));
-        vertices.forEach(graph::addVertex);
+        vertices.forEach(vertex -> graph.addVertex(new Vertex(vertex, vertex, Color.BLUE.getColor())));
         for (int destVertexPosition = 1; destVertexPosition < vertices.size(); destVertexPosition++) {
-            edgeService.addEdge(graph, vertices, ParserConstants.MAIN_VERTEX_POSITION, destVertexPosition);
+            edgeService.addEdge(graph, graph.getVertices(), ParserConstants.MAIN_VERTEX_POSITION, destVertexPosition);
         }
     }
 }

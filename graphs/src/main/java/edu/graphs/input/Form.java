@@ -1,6 +1,7 @@
 package edu.graphs.input;
 
 import edu.graphs.model.Edge;
+import edu.graphs.model.Vertex;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class Form {
 
-    private String vertex;
+    private Vertex vertex;
 
     private String label;
 

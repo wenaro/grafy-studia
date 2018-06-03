@@ -14,7 +14,7 @@ public class NeighborhoodListConverter {
 
         for (int i = 0; i < graph.getVertices().size(); i++) {
 
-            final String vertex = graph.getVertices().get(i);
+            final String vertex = graph.getVertices().get(i).getId();
             stringBuilder.append(vertex);
             for (int j = 0; j < graph.getEdges().size(); j++) {
                 final Edge edge1 = graph.getEdges().get(j);

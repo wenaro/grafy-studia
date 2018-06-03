@@ -1,5 +1,6 @@
 package edu.graphs.input;
 
+import edu.graphs.model.OrderType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,4 +14,5 @@ public class Input {
     //todo dodac inne konwersje
     //todo na razie jest graf do listy sasiedztwa
     private Type conversionType;
+    private OrderType orderType;
 }

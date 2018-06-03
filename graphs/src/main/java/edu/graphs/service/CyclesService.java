@@ -1,7 +1,9 @@
+/*
 package edu.graphs.service;
 
 import edu.graphs.model.Edge;
 import edu.graphs.model.Graph;
+import edu.graphs.model.Vertex;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -70,11 +72,11 @@ public class CyclesService {
 
     private boolean isCohesion(Graph graph) {
         final List<String> stack = new ArrayList<>();
-        final List<String> vertices = graph.getVertices();
+        final List<Vertex> vertices = graph.getVertices();
         final List<String> visitedVertices = new ArrayList<>();
         boolean isCohesion;
 
-        stack.add(vertices.get(0));
+        stack.add(vertices.get(0).getId());
 
         while (!stack.isEmpty()) {
             final String v = stack.get(stack.size() - 1);
@@ -117,11 +119,11 @@ public class CyclesService {
     }
 
     private boolean isEvenNumberOfEdges(final Graph graph) {
-        for (String vertex : graph.getVertices()) {
+        for (final Vertex vertex : graph.getVertices()) {
             final List<Edge> edgesToVertex = new ArrayList<>();
 
             for (Edge edge : graph.getEdges()) {
-                if (edge.getSource().equals(vertex) || edge.getDestination().equals(vertex)) {
+                if (edge.getSource().equals(vertex.getId()) || edge.getDestination().equals(vertex.getId())) {
                     edgesToVertex.add(edge);
                 }
             }
@@ -205,3 +207,4 @@ public class CyclesService {
         return cycle;
     }
 }
+*/

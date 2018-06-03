@@ -4,6 +4,7 @@ import edu.graphs.constants.ParserConstants;
 import edu.graphs.input.Form;
 import edu.graphs.model.Edge;
 import edu.graphs.model.Graph;
+import edu.graphs.model.Vertex;
 import java.util.Iterator;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -11,12 +12,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class EdgeService {
 
-    public void addEdge(final Graph graph, final List<String> vertices, final int sourceVertexPosition,
+    public void addEdge(final Graph graph, final List<Vertex> vertices, final int sourceVertexPosition,
                         final int destinationVertexPosition) {
-        final String source = vertices.get(sourceVertexPosition);
-        final String destination = vertices.get(destinationVertexPosition);
+        final Vertex source = vertices.get(sourceVertexPosition);
+        final Vertex destination = vertices.get(destinationVertexPosition);
         final Edge edge =
-            new Edge(createEdgeLabel(source, destination), source, destination, ParserConstants.DEFAULT_WEIGHT);
+            new Edge(createEdgeLabel(source.getId(), destination.getId()), source.getId(), destination.getId(),
+                ParserConstants.DEFAULT_WEIGHT);
         graph.addEdge(edge);
     }
 
