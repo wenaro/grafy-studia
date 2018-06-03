@@ -1,12 +1,12 @@
 package edu.graphs.service;
 
-import edu.graphs.constants.ParserConstants;
 import edu.graphs.input.Form;
 import edu.graphs.model.Edge;
 import edu.graphs.model.Graph;
 import edu.graphs.model.Vertex;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,7 +18,7 @@ public class EdgeService {
         final Vertex destination = vertices.get(destinationVertexPosition);
         final Edge edge =
             new Edge(createEdgeLabel(source.getId(), destination.getId()), source.getId(), destination.getId(),
-                ParserConstants.DEFAULT_WEIGHT);
+                new Random().nextInt(100) + 1);
         graph.addEdge(edge);
     }
 

@@ -5,6 +5,7 @@ import edu.graphs.converter.GraphConverter;
 import edu.graphs.input.Input;
 import edu.graphs.input.Type;
 import edu.graphs.model.Color;
+import edu.graphs.model.Edge;
 import edu.graphs.model.Graph;
 import edu.graphs.model.OrderType;
 import edu.graphs.model.Vertex;
@@ -13,9 +14,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -58,7 +61,10 @@ public class GraphService {
         }
 
         colorService.makeGraphColored(graph);
-        System.out.println(graphSearchingService.DFS(graph));
+
+        //TODO ZWRACA SCIEZKE Z WAGA TRZEBA TYLKO PRZEKAZAC WIERZCHOLEK Z FRONTU JAKO DRUGI ARGUMENT I ZROBIC POLE
+        // GDZIE SIE BEDZIE TO WPISYWAC
+        getTheShortestPathsToEachVertexFromSelected(graph, graph.getVertices().get(0));
         return graph;
     }
 
@@ -111,8 +117,7 @@ public class GraphService {
                 String.valueOf(ParserConstants.ALPHABET[i]).toUpperCase(), Color.BLUE.getColor());
             graph.addVertex(vertex);
         }
-        final List<String> createdVertices = new ArrayList<>();
-      //  graph.getVertices().forEach(x -> createdVertices.add(x.getId()));
+
         graph.getVertices().iterator().next();
         for (int sourceVertexPosition = 0; sourceVertexPosition < rows.size(); sourceVertexPosition++) {
             final List<String> elementsInRow =
@@ -142,6 +147,87 @@ public class GraphService {
         vertices.forEach(vertex -> graph.addVertex(new Vertex(vertex, vertex, Color.BLUE.getColor())));
         for (int destVertexPosition = 1; destVertexPosition < vertices.size(); destVertexPosition++) {
             edgeService.addEdge(graph, graph.getVertices(), ParserConstants.MAIN_VERTEX_POSITION, destVertexPosition);
+        }
+    }
+
+    private List<String> getTheShortestPathsToEachVertexFromSelected(Graph graph, Vertex source) {
+        calculateShortestPathFromSource(graph, source);
+
+        final List<String> pathsWithWeight = new ArrayList<>();
+
+        for (Vertex vertex : graph.getVertices()) {
+            StringBuilder path = new StringBuilder(
+                String.format("Path from vertex: %s to vertex: %s : ", source.getId(), vertex.getId()));
+            for (Vertex vertex1 : vertex.getShortestPath()) {
+                path.append(vertex1.getId()).append(ParserConstants.ARROW_SEPARATOR);
+            }
+            path.append(vertex.getId()).append(", weight: " + vertex.getDistance());
+            pathsWithWeight.add(path.toString());
+        }
+
+        return pathsWithWeight;
+    }
+
+    public Graph calculateShortestPathFromSource(Graph graph, Vertex source) {
+        addAdjacencyVertexesToEachVertex(graph);
+        source.setDistance(0);
+
+        Set<Vertex> settledNodes = new HashSet<>();
+        Set<Vertex> unsettledNodes = new HashSet<>();
+
+        unsettledNodes.add(source);
+
+        while (!unsettledNodes.isEmpty()) {
+            Vertex currentNode = getLowestDistanceNode(unsettledNodes);
+            unsettledNodes.remove(currentNode);
+            for (Map.Entry<Vertex, Integer> adjacencyPair : currentNode.getAdjacentNodes().entrySet()) {
+                Vertex adjacentNode = adjacencyPair.getKey();
+                Integer edgeWeight = adjacencyPair.getValue();
+                if (!settledNodes.contains(adjacentNode)) {
+                    calculateMinimumDistance(adjacentNode, edgeWeight, currentNode);
+                    unsettledNodes.add(adjacentNode);
+                }
+            }
+            settledNodes.add(currentNode);
+        }
+        return graph;
+    }
+
+    private Vertex getLowestDistanceNode(Set<Vertex> unsettledNodes) {
+        Vertex lowestDistanceNode = null;
+        int lowestDistance = Integer.MAX_VALUE;
+        for (Vertex node : unsettledNodes) {
+            int nodeDistance = node.getDistance();
+            if (nodeDistance < lowestDistance) {
+                lowestDistance = nodeDistance;
+                lowestDistanceNode = node;
+            }
+        }
+        return lowestDistanceNode;
+    }
+
+    private void calculateMinimumDistance(Vertex evaluationNode, Integer edgeWeigh, Vertex sourceNode) {
+        Integer sourceDistance = sourceNode.getDistance();
+        if (sourceDistance + edgeWeigh < evaluationNode.getDistance()) {
+            evaluationNode.setDistance(sourceDistance + edgeWeigh);
+            LinkedList<Vertex> shortestPath = new LinkedList<>(sourceNode.getShortestPath());
+            shortestPath.add(sourceNode);
+            evaluationNode.setShortestPath(shortestPath);
+        }
+    }
+
+    private void addAdjacencyVertexesToEachVertex(Graph graph) {
+        for (Vertex vertex : graph.getVertices()) {
+            final Set<Vertex> neighbors = colorService.getNeighbors(graph, vertex);
+            for (Vertex neighbour : neighbors) {
+                for (Edge edge1 : graph.getEdges()) {
+                    if (vertex.getId().equals(edge1.getSource()) && neighbour.getId().equals(edge1.getDestination())
+                        || vertex.getId().equals(edge1.getDestination()) && neighbour.getId()
+                        .equals(edge1.getSource())) {
+                        vertex.addDestination(neighbour, edge1.getWeight());
+                    }
+                }
+            }
         }
     }
 }

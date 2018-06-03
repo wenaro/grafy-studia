@@ -1,13 +1,18 @@
 package edu.graphs.model;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 public class Vertex {
 
@@ -16,6 +21,22 @@ public class Vertex {
     private String label;
 
     private String color;
+
+    private List<Vertex> shortestPath = new LinkedList<>();
+
+    private Integer distance = Integer.MAX_VALUE;
+
+    private Map<Vertex, Integer> adjacentNodes = new HashMap<>();
+
+    public Vertex(final String id, final String label, final String color) {
+        this.id = id;
+        this.label = label;
+        this.color = color;
+    }
+
+    public void addDestination(Vertex destination, int distance) {
+        adjacentNodes.put(destination, distance);
+    }
 
     @Override
     public boolean equals(final Object o) {
